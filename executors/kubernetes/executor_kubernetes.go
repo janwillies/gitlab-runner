@@ -138,6 +138,10 @@ func (s *executor) buildContainer(name, image string, limits api.ResourceList, c
 				Name:      "repo",
 				MountPath: strings.Join(path, "/"),
 			},
+			api.VolumeMount{
+				Name:      "docker",
+				MountPath: "/var/run/docker.sock",
+			},
 		},
 		SecurityContext: &api.SecurityContext{
 			Privileged: &privileged,
@@ -165,6 +169,14 @@ func (s *executor) setupBuildPod() error {
 					Name: "repo",
 					VolumeSource: api.VolumeSource{
 						EmptyDir: &api.EmptyDirVolumeSource{},
+					},
+				},
+				api.Volume{
+					Name: "docker",
+					VolumeSource: api.VolumeSource{
+						HostPath: &api.HostPathVolumeSource{
+							Path: "/var/run/docker.sock",
+						},
 					},
 				},
 			},
