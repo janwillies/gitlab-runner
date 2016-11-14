@@ -139,8 +139,16 @@ func (s *executor) buildContainer(name, image string, limits api.ResourceList, c
 				MountPath: strings.Join(path, "/"),
 			},
 			api.VolumeMount{
-				Name:      "docker",
+				Name:      "docker-socket",
 				MountPath: "/var/run/docker.sock",
+			},
+			api.VolumeMount{
+				Name:      "docker-cred",
+				MountPath: "/root/.docker/",
+			},
+			api.VolumeMount{
+				Name:      "kube-cred",
+				MountPath: "/root/.kube/",
 			},
 		},
 		SecurityContext: &api.SecurityContext{
@@ -172,10 +180,26 @@ func (s *executor) setupBuildPod() error {
 					},
 				},
 				api.Volume{
-					Name: "docker",
+					Name: "docker-socket",
 					VolumeSource: api.VolumeSource{
 						HostPath: &api.HostPathVolumeSource{
 							Path: "/var/run/docker.sock",
+						},
+					},
+				},
+				api.Volume{
+					Name: "docker-cred",
+					VolumeSource: api.VolumeSource{
+						Secret: &api.SecretVolumeSource{
+							SecretName: "docker-cred",
+						},
+					},
+				},
+				api.Volume{
+					Name: "kube-cred",
+					VolumeSource: api.VolumeSource{
+						Secret: &api.SecretVolumeSource{
+							SecretName: "kube-cred",
 						},
 					},
 				},
